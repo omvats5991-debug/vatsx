@@ -36,7 +36,7 @@
             color: var(--text-main);
             line-height: 1.6;
             overflow-x: hidden;
-            padding-top: var(--nav-height); /* Prevent content hiding behind fixed header */
+            padding-top: var(--nav-height);
         }
 
         a { text-decoration: none; color: inherit; }
@@ -139,11 +139,11 @@
 
         /* --- Layout System --- */
         main {
-            min-height: calc(100vh - var(--nav-height) - 80px); /* Adjust for footer */
+            min-height: calc(100vh - var(--nav-height) - 80px);
         }
 
         .page-section {
-            display: none; /* Hidden by default */
+            display: none;
             padding: 40px 5%;
             animation: fadeIn 0.5s ease;
         }
@@ -169,8 +169,6 @@
         p { color: var(--text-muted); margin-bottom: 15px; }
 
         /* --- Section Specifics --- */
-
-        /* Hero Section (Home) */
         .hero {
             text-align: center;
             padding: 80px 0;
@@ -189,7 +187,6 @@
             flex-wrap: wrap;
         }
 
-        /* Features Grid */
         .features-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -216,7 +213,6 @@
             margin-bottom: 15px;
         }
 
-        /* Steps */
         .steps-container {
             display: flex;
             justify-content: space-between;
@@ -245,9 +241,8 @@
             margin: 0 auto 15px;
         }
 
-        /* Safety Promise */
         .safety-box {
-            background-color: #263238; /* Dark Blue-Grey */
+            background-color: #263238;
             padding: 30px;
             border-radius: var(--border-radius);
             display: flex;
@@ -261,7 +256,6 @@
             color: var(--success);
         }
 
-        /* Services Grid (Customer Page) */
         .services-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -276,7 +270,6 @@
             border-top: 3px solid var(--primary-color);
         }
 
-        /* Driver Form */
         .form-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -324,7 +317,6 @@
             margin-top: 20px;
         }
 
-        /* Team Section */
         .team-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -337,17 +329,28 @@
             border-radius: var(--border-radius);
             overflow: hidden;
             text-align: center;
+            padding-bottom: 20px;
         }
 
+        /* Circle Shape Style */
         .team-img {
-            width: 100%;
-            height: 250px;
+            width: 200px;
+            height: 200px;
             object-fit: cover;
             background-color: #333;
+            border-radius: 50%;
+            margin: 20px auto 0;
+            border: 3px solid var(--primary-color);
+            object-position: center; 
+        }
+
+        /* Specific fix for Om Vats to show face from top */
+        .om-img-top {
+            object-position: top center !important;
         }
 
         .team-info {
-            padding: 20px;
+            padding: 15px 20px 0;
         }
 
         .team-name {
@@ -359,9 +362,29 @@
         .team-role {
             font-size: 0.9rem;
             color: var(--primary-color);
+            margin-bottom: 8px;
         }
 
-        /* Contact Page */
+        /* Team Phone Number Style */
+        .team-phone {
+            display: inline-block;
+            margin-top: 5px;
+            font-size: 0.95rem;
+            color: #888;
+            background-color: rgba(255,255,255,0.05);
+            padding: 5px 10px;
+            border-radius: 20px;
+            transition: var(--transition);
+            border: 1px solid transparent;
+        }
+
+        .team-phone:hover {
+            color: var(--primary-color);
+            background-color: rgba(255, 193, 7, 0.1);
+            border-color: var(--primary-color);
+            text-decoration: none;
+        }
+
         .contact-wrapper {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -388,7 +411,6 @@
             width: 20px;
         }
 
-        /* Footer */
         footer {
             background-color: #000;
             padding: 30px 5%;
@@ -397,7 +419,6 @@
             margin-top: auto;
         }
 
-        /* Responsive */
         @media (max-width: 768px) {
             .nav-links {
                 display: none;
@@ -415,7 +436,7 @@
                 display: flex;
             }
 
-            .header-actions { display: none; } /* Hide desktop header buttons on mobile, rely on page content buttons */
+            .header-actions { display: none; }
             .menu-toggle { display: block; }
             
             .form-grid { grid-template-columns: 1fr; }
@@ -453,7 +474,6 @@
     <main>
         <!-- ================= HOME PAGE ================= -->
         <section id="home" class="page-section active-section">
-            <!-- Hero -->
             <div class="hero">
                 <div class="container">
                     <h1>VATSX — Trusted Driver & Vehicle Service</h1>
@@ -466,7 +486,6 @@
             </div>
 
             <div class="container">
-                <!-- Why Choose -->
                 <h2>Why Choose VATSX</h2>
                 <div class="features-grid">
                     <div class="feature-card">
@@ -496,7 +515,6 @@
                     </div>
                 </div>
 
-                <!-- How It Works -->
                 <h2>How It Works</h2>
                 <div class="steps-container">
                     <div class="step-item">
@@ -521,7 +539,6 @@
                     </div>
                 </div>
 
-                <!-- Safety Promise -->
                 <h2>Safety Promise</h2>
                 <div class="safety-box">
                     <i class="fas fa-id-card safety-icon"></i>
@@ -531,26 +548,27 @@
                     </div>
                 </div>
 
-                <!-- Team Preview -->
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                     <h2>Our Team</h2>
                     <button onclick="router('team')" class="btn btn-outline" style="padding: 5px 15px; font-size: 0.8rem;">View Full Team</button>
                 </div>
                 <div class="team-grid">
-                    <!-- Founder with Custom Image -->
+                    <!-- Founder (Om Vats) -->
                     <div class="team-card">
-                        <img src="https://z-cdn-media.chatglm.cn/files/e4941e01-9199-4e63-bff3-514d5ca11727.png?auth_key=1871691515-5f4d930a6f9f4474969469bad35170ec-0-58580caba8617c3230d0befc15740610" alt="Om Vats" class="team-img">
+                        <img src="https://z-cdn-media.chatglm.cn/files/856c9c59-151c-46bc-9cec-843df10dac15.jpeg?auth_key=1871937602-bb4997e440a64e28a305fd7311a9dcd2-0-a0376a2a0f95bd494078b4d9ac20baf0" alt="Om Vats" class="team-img om-img-top">
                         <div class="team-info">
                             <div class="team-name">Om Vats</div>
                             <div class="team-role">Founder & Operations</div>
+                            <a href="tel:+919523847418" class="team-phone" title="Click to Call"><i class="fas fa-phone-alt"></i> ******7418</a>
                         </div>
                     </div>
                     <!-- Anshu Roy -->
                     <div class="team-card">
-                        <img src="https://picsum.photos/seed/anshu/300/300" alt="Anshu Roy" class="team-img">
+                        <img src="https://z-cdn-media.chatglm.cn/files/04a1d1ff-252f-4fc5-9c9b-b1667ab24803.png?auth_key=1871937387-cf4159398f8945dca1b95e8ed3c0f214-0-02ce74d47b5c7bf9e73bca3964e660e9" alt="Anshu Roy" class="team-img">
                         <div class="team-info">
                             <div class="team-name">Anshu Roy</div>
                             <div class="team-role">Senior Team Member</div>
+                            <a href="tel:+917808018439" class="team-phone" title="Click to Call"><i class="fas fa-phone-alt"></i> ******8439</a>
                         </div>
                     </div>
                 </div>
@@ -562,7 +580,6 @@
             <div class="container">
                 <h1 style="text-align: center; margin-bottom: 40px;">Available Driver & Vehicle Service</h1>
                 
-                <!-- Why Choose (Repeated) -->
                 <h2>Why Choose VATSX</h2>
                 <div class="features-grid">
                     <div class="feature-card">
@@ -582,7 +599,6 @@
                     </div>
                 </div>
 
-                <!-- Services -->
                 <h2>Our Services</h2>
                 <div class="services-grid">
                     <div class="service-card">
@@ -612,7 +628,6 @@
                     </div>
                 </div>
 
-                <!-- Booking Instructions -->
                 <div class="safety-box" style="background-color: #1e3a8a;">
                     <i class="fab fa-whatsapp safety-icon" style="color: #fff;"></i>
                     <div>
@@ -630,7 +645,6 @@
                     </div>
                 </div>
 
-                <!-- Team Info (Repeated) -->
                 <h2>Meet Our Drivers</h2>
                 <div class="team-grid">
                     <div class="team-card">
@@ -708,10 +722,11 @@
                             </select>
                         </div>
 
-                        <!-- Document Uploads -->
+                        <!-- Document Uploads (Visual only for mailto) -->
                         <div class="form-group full-width">
-                            <label for="vehiclePhoto">Upload Vehicle Photo *</label>
+                            <label for="vehiclePhoto">Vehicle Photo *</label>
                             <input type="file" id="vehiclePhoto" accept="image/*" required>
+                            <small style="color: #888; font-size: 0.8rem;">You will need to attach this in the email window.</small>
                         </div>
                         <div class="form-group full-width">
                             <label for="licensePhoto">Driving License *</label>
@@ -731,11 +746,11 @@
                     </div>
                 </form>
 
-                <!-- Success Message (Hidden by default) -->
+                <!-- Success Message -->
                 <div id="successMessage" class="success-message">
-                    <i class="fas fa-check-circle" style="font-size: 3rem; margin-bottom: 15px;"></i>
-                    <h3>Profile Submitted Successfully!</h3>
-                    <p>Your profile has been submitted. Our team will verify your details and contact you shortly.</p>
+                    <i class="fas fa-envelope-open-text" style="font-size: 3rem; margin-bottom: 15px;"></i>
+                    <h3>Almost Done!</h3>
+                    <p id="successText">Your email app has opened with your details. Please attach your Vehicle Photo, License, and Aadhaar Card, then click Send.</p>
                     <button onclick="resetForm()" class="btn btn-outline" style="margin-top: 15px;">Submit Another</button>
                 </div>
 
@@ -748,12 +763,13 @@
                 <h1 style="text-align: center;">Meet Our Team</h1>
                 <p style="text-align: center; margin-bottom: 50px;">The dedicated people behind VATSX.</p>
 
-                <!-- Founder Highlight with Custom Image -->
+                <!-- Founder Highlight (Om Vats) -->
                 <div class="team-card" style="max-width: 400px; margin: 0 auto 50px; border: 2px solid var(--primary-color);">
-                    <img src="https://z-cdn-media.chatglm.cn/files/e4941e01-9199-4e63-bff3-514d5ca11727.png?auth_key=1871691515-5f4d930a6f9f4474969469bad35170ec-0-58580caba8617c3230d0befc15740610" alt="Om Vats" class="team-img">
+                    <img src="https://z-cdn-media.chatglm.cn/files/856c9c59-151c-46bc-9cec-843df10dac15.jpeg?auth_key=1871937602-bb4997e440a64e28a305fd7311a9dcd2-0-a0376a2a0f95bd494078b4d9ac20baf0" alt="Om Vats" class="team-img om-img-top">
                     <div class="team-info">
                         <div class="team-name" style="font-size: 1.5rem;">Om Vats</div>
                         <div class="team-role" style="font-size: 1.1rem;">Founder & Operations Head</div>
+                        <a href="tel:+919523847418" class="team-phone" title="Click to Call"><i class="fas fa-phone-alt"></i> ******7418</a>
                         <p style="margin-top: 10px; font-size: 0.9rem;">"Building a transport service that the people of Samastipur can trust blindly."</p>
                         <div style="margin-top: 15px;">
                             <a href="#" style="color: var(--text-muted); margin: 0 10px;"><i class="fab fa-linkedin"></i></a>
@@ -766,34 +782,38 @@
                 <div class="team-grid">
                     <!-- 1. Anshu Roy -->
                     <div class="team-card">
-                        <img src="https://picsum.photos/seed/anshu/300/300" alt="Anshu Roy" class="team-img">
+                        <img src="https://z-cdn-media.chatglm.cn/files/04a1d1ff-252f-4fc5-9c9b-b1667ab24803.png?auth_key=1871937387-cf4159398f8945dca1b95e8ed3c0f214-0-02ce74d47b5c7bf9e73bca3964e660e9" alt="Anshu Roy" class="team-img">
                         <div class="team-info">
                             <div class="team-name">Anshu Roy</div>
                             <div class="team-role">Manager</div>
+                            <a href="tel:+917808018439" class="team-phone" title="Click to Call"><i class="fas fa-phone-alt"></i> ******8439</a>
                         </div>
                     </div>
                     <!-- 2. Nishu Roy -->
                     <div class="team-card">
-                        <img src="https://picsum.photos/seed/nishu/300/300" alt="Nishu Roy" class="team-img">
+                        <img src="https://z-cdn-media.chatglm.cn/files/e816c74d-8bde-4105-8995-25d8c63e1bad.png?auth_key=1871937387-2b9da65cb32c4333aca7c3d0aadf920f-0-86cc4db85006b1dfb315a0f96ca30ceb" alt="Nishu Roy" class="team-img">
                         <div class="team-info">
                             <div class="team-name">Nishu Roy</div>
                             <div class="team-role">Support Lead</div>
+                            <!-- Nishu number not provided, so omitted -->
                         </div>
                     </div>
-                    <!-- 3. Lalit -->
+                    <!-- 3. Lalit (Updated Image & Number) -->
                     <div class="team-card">
-                        <img src="https://picsum.photos/seed/lalit/300/300" alt="Lalit" class="team-img">
+                        <img src="https://z-cdn-media.chatglm.cn/files/8fa543d0-d2ed-4259-bb0f-8f3907f91a01.png?auth_key=1871940853-a8d0c07f84b24076920413907c2f63bf-0-740ef3a4f2bca89254bd23c5a852e1ad" alt="Lalit" class="team-img">
                         <div class="team-info">
                             <div class="team-name">Lalit</div>
                             <div class="team-role">Fleet Manager</div>
+                            <a href="tel:+919334930604" class="team-phone" title="Click to Call"><i class="fas fa-phone-alt"></i> ******0604</a>
                         </div>
                     </div>
-                    <!-- 4. Krish -->
+                    <!-- 4. Krish (Added Number) -->
                     <div class="team-card">
                         <img src="https://picsum.photos/seed/krish/300/300" alt="Krish" class="team-img">
                         <div class="team-info">
                             <div class="team-name">Krish</div>
                             <div class="team-role">Operations</div>
+                            <a href="tel:+917870219522" class="team-phone" title="Click to Call"><i class="fas fa-phone-alt"></i> ******9522</a>
                         </div>
                     </div>
                 </div>
@@ -824,7 +844,6 @@
                                     <a href="https://wa.me/919523847418">Chat with us</a>
                                 </div>
                             </div>
-                            <!-- Updated Email Here -->
                             <div class="contact-item">
                                 <i class="fas fa-envelope"></i>
                                 <div>
@@ -844,7 +863,6 @@
                                     Bihar, India - 848101
                                 </div>
                             </div>
-                            <!-- Map Placeholder -->
                             <div style="width: 100%; height: 200px; background-color: #333; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-top: 20px;">
                                 <span style="color: #777;"><i class="fas fa-map"></i> Google Map View</span>
                             </div>
@@ -884,21 +902,17 @@
 
     <!-- JavaScript Logic -->
     <script>
-        // --- Navigation / Routing Logic ---
         function router(pageId) {
-            // Hide all sections
             const sections = document.querySelectorAll('.page-section');
             sections.forEach(section => {
                 section.classList.remove('active-section');
             });
 
-            // Show target section
             const target = document.getElementById(pageId);
             if (target) {
                 target.classList.add('active-section');
             }
 
-            // Update Nav Buttons
             const buttons = document.querySelectorAll('.nav-btn');
             buttons.forEach(btn => {
                 btn.classList.remove('active');
@@ -907,35 +921,72 @@
                 }
             });
 
-            // Scroll to top
             window.scrollTo(0, 0);
 
-            // Close mobile menu if open
             const navLinks = document.getElementById('navLinks');
             navLinks.classList.remove('mobile-active');
         }
 
-        // --- Mobile Menu Toggle ---
         function toggleMenu() {
             const navLinks = document.getElementById('navLinks');
             navLinks.classList.toggle('mobile-active');
         }
 
-        // --- Driver Registration Handling ---
+        // --- Driver Registration Handling (Email via Mailto) ---
         function handleRegistration(event) {
-            event.preventDefault(); // Prevent actual server submission
-            
-            // Hide Form
-            const form = document.getElementById('driverForm');
-            form.style.display = 'none';
+            event.preventDefault();
 
-            // Show Success Message
+            // 1. Get Form Data
+            const fullName = document.getElementById('fullName').value;
+            const localName = document.getElementById('localName').value;
+            const phone = document.getElementById('phone').value;
+            const altPhone = document.getElementById('altPhone').value;
+            const vehicleType = document.getElementById('vehicleType').value;
+            const vehicleNumber = document.getElementById('vehicleNumber').value;
+            const area = document.getElementById('area').value;
+            const availability = document.getElementById('availability').value;
+
+            // 2. Construct Email Body
+            const emailBody = `
+DRIVER REGISTRATION APPLICATION
+-------------------------------
+Full Name: ${fullName}
+Local Name: ${localName}
+Phone: ${phone}
+Alternate Phone: ${altPhone}
+Vehicle Type: ${vehicleType}
+Vehicle Number: ${vehicleNumber}
+Area: ${area}
+Availability: ${availability}
+
+ATTACHMENTS REQUIRED:
+- Vehicle Photo
+- Driving License
+- Aadhaar Card
+(Please attach these documents to this email before sending)
+            `;
+
+            // 3. Encode for URL
+            const subject = encodeURIComponent(`New Driver Application: ${fullName}`);
+            const body = encodeURIComponent(emailBody);
+            const destinationEmail = "vatsxservice@gmail.com";
+
+            // 4. Open Email Client
+            window.location.href = `mailto:${destinationEmail}?subject=${subject}&body=${body}`;
+
+            // 5. Show Success Message on Website
+            const form = document.getElementById('driverForm');
             const successMsg = document.getElementById('successMessage');
+            const successText = document.getElementById('successText');
+
+            form.style.display = 'none';
             successMsg.style.display = 'block';
+            
+            // Update text to guide the user
+            successText.innerText = `An email window has opened for ${destinationEmail}. Please attach your Vehicle Photo, License, and Aadhaar Card, then click Send.`;
         }
 
         function resetForm() {
-            // Reset and show form again
             const form = document.getElementById('driverForm');
             form.reset();
             form.style.display = 'block';
