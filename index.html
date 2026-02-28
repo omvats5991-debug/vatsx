@@ -4,14 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VATSX - Trusted Driver & Vehicle Service</title>
-    <!-- FontAwesome for Icons -->
+    <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
     
     <style>
         :root {
-            --primary-color: #FFC107; /* Amber/Gold for trust and energy */
+            --primary-color: #FFC107;
             --primary-hover: #FFD54F;
             --bg-dark: #121212;
             --bg-card: #1E1E1E;
@@ -19,16 +19,16 @@
             --text-main: #FFFFFF;
             --text-muted: #B0B0B0;
             --success: #4CAF50;
+            --error: #ff4444;
+            --admin-green: #00ff41;
+            --admin-bg: #0d1117;
+            --admin-border: #30363d;
             --border-radius: 8px;
             --transition: all 0.3s ease;
             --nav-height: 70px;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: 'Inter', sans-serif;
@@ -41,591 +41,276 @@
 
         a { text-decoration: none; color: inherit; }
         ul { list-style: none; }
-        img { max-width: 100%; display: block; }
+        /* Prevent dragging for rapid clicking trigger */
+        img { max-width: 100%; display: block; user-select: none; -webkit-user-drag: none; } 
 
-        /* --- Header & Navigation --- */
-        header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: var(--nav-height);
-            background-color: rgba(18, 18, 18, 0.95);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid #333;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 5%;
-            z-index: 1000;
+        /* --- BOOT SCREEN --- */
+        #boot-screen {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: #000; z-index: 99999; display: flex;
+            justify-content: center; align-items: center; overflow: hidden;
+            transition: opacity 0.8s ease-in-out;
         }
-
-        .logo {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--text-main);
-            display: flex;
-            align-items: center;
-            gap: 10px;
+        #boot-screen::before {
+            content: ""; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+            background: transparent url('data:image/svg+xml;utf8,%3Csvg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"%3E%3Cfilter id="noiseFilter"%3E%3CfeTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/%3E%3C/filter%3E%3Crect width="100%25" height="100%25" filter="url(%23noiseFilter)" opacity="0.05"/%3E%3C/svg%3E');
+            animation: noise 0.2s infinite; pointer-events: none;
         }
+        #boot-screen::after {
+            content: " "; display: block; position: absolute; top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 2; background-size: 100% 2px, 3px 100%; pointer-events: none;
+        }
+        .logo-container { position: relative; z-index: 10; width: 300px; max-width: 80%; display: flex; justify-content: center; align-items: center; }
+        .boot-logo { width: 100%; height: auto; opacity: 0; animation: bootFadeIn 0.1s forwards 0.5s; filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.2)); }
+        .boot-logo::before, .boot-logo::after {
+            content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url('https://z-cdn-media.chatglm.cn/files/afaad532-65ce-4644-a682-ed9db15dfda6.png?auth_key=1872289323-10f9a99548e3412aa4359f893952ff6b-0-b8376bba87325ef8d88d5e43f1fb8dcb');
+            background-size: contain; background-repeat: no-repeat; background-position: center;
+            opacity: 0; mix-blend-mode: hard-light;
+        }
+        .boot-logo::before { background-color: red; animation: glitch-anim-1 2.5s infinite linear alternate-reverse; }
+        .boot-logo::after { background-color: blue; animation: glitch-anim-2 2s infinite linear alternate-reverse; }
+        .boot-text { position: absolute; bottom: 20%; font-family: 'Courier New', monospace; color: #0f0; font-size: 14px; text-transform: uppercase; letter-spacing: 2px; opacity: 0; animation: blinkText 0.1s infinite 0.8s; }
+        
+        @keyframes noise { 0% { transform: translate(0, 0); } 10% { transform: translate(-5%, -5%); } 20% { transform: translate(-10%, 5%); } 30% { transform: translate(5%, -10%); } 40% { transform: translate(-5%, 15%); } 50% { transform: translate(-10%, 5%); } 60% { transform: translate(15%, 0); } 70% { transform: (0, 10%); } 80% { transform: translate(-15%, 0); } 90% { transform: translate(10%, 5%); } 100% { transform: translate(5%, 0); } }
+        @keyframes bootFadeIn { from { opacity: 0; transform: scale(1.1); } to { opacity: 1; transform: scale(1); } }
+        @keyframes blinkText { 0% { opacity: 1; } 50% { opacity: 0; } 100% { opacity: 1; } }
+        @keyframes glitch-anim-1 { 0% { clip-path: inset(20% 0 80% 0); transform: translate(-2px, 1px); opacity: 0; } 10% { clip-path: inset(60% 0 10% 0); transform: translate(2px, -1px); opacity: 0.8; } 20% { clip-path: inset(40% 0 50% 0); transform: translate(-2px, 2px); opacity: 0; } 30% { clip-path: inset(80% 0 5% 0); transform: translate(2px, -2px); opacity: 0.7; } 40% { clip-path: inset(10% 0 60% 0); transform: translate(-1px, 1px); opacity: 0; } 50% { clip-path: inset(30% 0 20% 0); transform: translate(1px, -1px); opacity: 0; } 60% { clip-path: inset(70% 0 10% 0); transform: translate(-2px, 0); opacity: 0.5; } 70% { clip-path: inset(20% 0 50% 0); transform: translate(2px, 0); opacity: 0; } 80% { clip-path: inset(50% 0 30% 0); transform: translate(-1px, 2px); opacity: 0; } 90% { clip-path: inset(10% 0 80% 0); transform: translate(1px, -2px); opacity: 0; } 100% { clip-path: inset(30% 0 10% 0); transform: translate(0, 0); opacity: 0; } }
+        @keyframes glitch-anim-2 { 0% { clip-path: inset(10% 0 60% 0); transform: translate(2px, -1px); opacity: 0; } 20% { clip-path: inset(80% 0 5% 0); transform: translate(-2px, 1px); opacity: 0.7; } 40% { clip-path: inset(40% 0 30% 0); transform: translate(2px, -2px); opacity: 0; } 60% { clip-path: inset(10% 0 70% 0); transform: translate(-2px, 2px); opacity: 0.6; } 80% { clip-path: inset(50% 0 20% 0); transform: translate(1px, -1px); opacity: 0; } 100% { clip-path: inset(20% 0 50% 0); transform: translate(-1px, 1px); opacity: 0; } }
 
+        .logo-container.stable .boot-logo::before, .logo-container.stable .boot-logo::after { display: none; }
+        .logo-container.stable .boot-logo { filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.5)); }
+
+        /* --- MAIN STYLES --- */
+        #toast-container { position: fixed; top: 90px; right: 20px; z-index: 2000; display: flex; flex-direction: column; gap: 10px; }
+        .toast { background-color: var(--bg-card); color: var(--text-main); padding: 15px 25px; border-radius: var(--border-radius); box-shadow: 0 5px 15px rgba(0,0,0,0.5); display: flex; align-items: center; gap: 12px; border-left: 4px solid var(--primary-color); transform: translateX(120%); transition: transform 0.4s; min-width: 300px; }
+        .toast.show { transform: translateX(0); }
+        .toast.success { border-left-color: var(--success); }
+        .toast.error { border-left-color: var(--error); }
+
+        header { position: fixed; top: 0; left: 0; width: 100%; height: var(--nav-height); background-color: rgba(18, 18, 18, 0.95); backdrop-filter: blur(10px); border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; padding: 0 5%; z-index: 1000; }
+        .logo { font-size: 1.5rem; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 10px; }
         .logo i { color: var(--primary-color); }
+        .nav-links { display: flex; gap: 25px; }
+        .nav-links li button { background: none; border: none; color: var(--text-muted); font-size: 1rem; cursor: pointer; transition: var(--transition); font-weight: 500; }
+        .nav-links li button:hover, .nav-links li button.active { color: var(--primary-color); }
+        .header-actions { display: flex; gap: 15px; }
+        .btn { padding: 10px 20px; border-radius: var(--border-radius); font-weight: 600; cursor: pointer; transition: var(--transition); border: none; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 8px; }
+        .btn-primary { background-color: var(--primary-color); color: #000; }
+        .btn-primary:hover { background-color: var(--primary-hover); transform: translateY(-2px); }
+        .btn-outline { background-color: transparent; border: 1px solid var(--primary-color); color: var(--primary-color); }
+        .btn-outline:hover { background-color: rgba(255, 193, 7, 0.1); }
+        .menu-toggle { display: none; color: var(--text-main); font-size: 1.5rem; cursor: pointer; }
 
-        .nav-links {
-            display: flex;
-            gap: 25px;
-        }
+        main { min-height: calc(100vh - var(--nav-height) - 80px); }
+        .page-section { display: none; padding: 40px 5%; animation: fadeIn 0.5s ease; }
+        .page-section.active-section { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .container { max-width: 1200px; margin: 0 auto; }
 
-        .nav-links li button {
-            background: none;
-            border: none;
-            color: var(--text-muted);
-            font-size: 1rem;
-            cursor: pointer;
-            transition: var(--transition);
-            font-weight: 500;
-        }
-
-        .nav-links li button:hover, 
-        .nav-links li button.active {
-            color: var(--primary-color);
-        }
-
-        .header-actions {
-            display: flex;
-            gap: 15px;
-        }
-
-        .btn {
-            padding: 10px 20px;
-            border-radius: var(--border-radius);
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition);
-            border: none;
-            font-size: 0.9rem;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .btn-primary {
-            background-color: var(--primary-color);
-            color: #000;
-        }
-
-        .btn-primary:hover {
-            background-color: var(--primary-hover);
-            transform: translateY(-2px);
-        }
-
-        .btn-outline {
-            background-color: transparent;
-            border: 1px solid var(--primary-color);
-            color: var(--primary-color);
-        }
-
-        .btn-outline:hover {
-            background-color: rgba(255, 193, 7, 0.1);
-        }
-
-        /* Mobile Menu Toggle */
-        .menu-toggle {
-            display: none;
-            color: var(--text-main);
-            font-size: 1.5rem;
-            cursor: pointer;
-        }
-
-        /* --- Layout System --- */
-        main {
-            min-height: calc(100vh - var(--nav-height) - 80px);
-        }
-
-        .page-section {
-            display: none;
-            padding: 40px 5%;
-            animation: fadeIn 0.5s ease;
-        }
-
-        .page-section.active-section {
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        /* --- Typography --- */
         h1 { font-size: 2.5rem; margin-bottom: 10px; line-height: 1.2; }
         h2 { font-size: 2rem; margin-bottom: 20px; color: var(--text-main); border-left: 4px solid var(--primary-color); padding-left: 15px; }
         h3 { font-size: 1.25rem; margin-bottom: 10px; color: var(--primary-color); }
         p { color: var(--text-muted); margin-bottom: 15px; }
 
-        /* --- Section Specifics --- */
-        .hero {
-            text-align: center;
-            padding: 80px 0;
-            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://picsum.photos/seed/transport/1920/1080') no-repeat center center/cover;
-            border-radius: 0 0 20px 20px;
-            margin-bottom: 40px;
-        }
-
+        .hero { text-align: center; padding: 80px 0; background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://picsum.photos/seed/transport/1920/1080') no-repeat center center/cover; border-radius: 0 0 20px 20px; margin-bottom: 40px; }
         .hero h1 { font-size: 3rem; color: var(--text-main); margin-bottom: 20px; }
         .hero p { font-size: 1.2rem; color: #ddd; margin-bottom: 30px; }
+        .hero-buttons { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; }
+
+        /* --- PUBLIC SECTION STYLES --- */
+        .location-card { background-color: var(--bg-card); border-radius: 20px; padding: 30px; margin-bottom: 60px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); text-align: center; border: 1px solid #333; max-width: 600px; margin-left: auto; margin-right: auto; }
+        .location-card h2 { border: none; padding: 0; margin-bottom: 5px; color: var(--text-main); }
+        .map-preview { height: 200px; background: linear-gradient(135deg, #2c3e50 0%, #000000 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 20px 0; position: relative; overflow: hidden; background-image: radial-gradient(#444 1px, transparent 1px); background-size: 20px 20px; border: 1px solid #444; }
+        .map-preview i { font-size: 3.5rem; color: var(--primary-color); animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.8; } 100% { transform: scale(1); opacity: 1; } }
+        .btn-whatsapp { background-color: #25D366; color: #fff; display: none; width: 100%; justify-content: center; padding: 15px; font-size: 1.1rem; animation: slideUp 0.3s ease-out; }
+        .btn-whatsapp:hover { background-color: #128C7E; transform: translateY(-2px); }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 60px; }
+        .feature-card { background-color: var(--bg-card); padding: 25px; border-radius: var(--border-radius); text-align: center; transition: var(--transition); }
+        .feature-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
+        .feature-card i { font-size: 2rem; color: var(--primary-color); margin-bottom: 15px; }
+
+        .steps-container { display: flex; justify-content: space-between; margin: 40px 0; flex-wrap: wrap; gap: 20px; }
+        .step-item { flex: 1; min-width: 200px; text-align: center; position: relative; }
+        .step-number { width: 40px; height: 40px; background-color: var(--primary-color); color: #000; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; margin: 0 auto 15px; }
+        .safety-box { background-color: #263238; padding: 30px; border-radius: var(--border-radius); display: flex; align-items: center; gap: 20px; margin-bottom: 40px; }
+        .safety-icon { font-size: 2.5rem; color: var(--success); }
         
-        .hero-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            flex-wrap: wrap;
-        }
+        .services-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 40px; }
+        .service-card { background-color: var(--bg-card); padding: 30px; border-radius: var(--border-radius); border-top: 3px solid var(--primary-color); }
+        
+        .stats-wrapper { margin: 40px 0; }
+        .stats-section { background: linear-gradient(180deg, #f4f6f8 0%, #ffffff 100%); border-radius: 20px; padding: 60px 5%; color: #333; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; max-width: 1000px; margin: 0 auto; }
+        .stat-card { background: #ffffff; border-radius: 16px; padding: 40px 30px; box-shadow: 0 8px 20px rgba(0,0,0,0.05); text-align: center; border: 1px solid rgba(0,0,0,0.03); transition: transform 0.3s ease; }
+        .stat-card:hover { transform: translateY(-5px); }
+        .stat-number { font-size: 4.5rem; font-weight: 800; color: var(--primary-color); margin: 10px 0; line-height: 1; }
+        .verified-badge { font-size: 2.5rem; color: #28a745; margin-bottom: 10px; }
+        .stat-card h3 { font-size: 1.5rem; color: #222; margin-bottom: 5px; }
+        .stat-card p { color: #666; font-size: 1rem; }
+        .vehicle-list { list-style: none; text-align: left; margin-top: 25px; padding: 0 10px; }
+        .vehicle-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; margin-bottom: 10px; background-color: #f9f9f9; border-radius: 8px; font-size: 1rem; font-weight: 500; color: #444; }
+        .vehicle-item i { margin-right: 10px; color: #555; }
+        .vehicle-count { background-color: var(--primary-color); color: #000; padding: 2px 10px; border-radius: 12px; font-weight: 700; font-size: 0.9rem; }
 
-        /* --- NEW LOCATION CARD STYLES --- */
-        .location-card {
-            background-color: var(--bg-card);
-            border-radius: 20px;
-            padding: 30px;
-            margin-bottom: 60px; /* Space before Why Choose VATSX */
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            text-align: center;
-            border: 1px solid #333;
-            max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .location-card h2 {
-            border: none;
-            padding: 0;
-            margin-bottom: 5px;
-            color: var(--text-main);
-        }
-
-        .map-preview {
-            height: 200px;
-            background: linear-gradient(135deg, #2c3e50 0%, #000000 100%);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 20px 0;
-            position: relative;
-            overflow: hidden;
-            /* Map grid pattern */
-            background-image: radial-gradient(#444 1px, transparent 1px);
-            background-size: 20px 20px;
-            border: 1px solid #444;
-        }
-
-        .map-preview i {
-            font-size: 3.5rem;
-            color: var(--primary-color);
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.1); opacity: 0.8; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-
-        .btn-whatsapp {
-            background-color: #25D366; /* WhatsApp Green */
-            color: #fff;
-            display: none; /* Hidden initially */
-            width: 100%;
-            justify-content: center;
-            padding: 15px;
-            font-size: 1.1rem;
-            animation: slideUp 0.3s ease-out;
-        }
-
-        .btn-whatsapp:hover {
-            background-color: #128C7E;
-            transform: translateY(-2px);
-        }
-
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* ------------------------------------------ */
-
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-bottom: 60px;
-        }
-
-        .feature-card {
-            background-color: var(--bg-card);
-            padding: 25px;
-            border-radius: var(--border-radius);
-            text-align: center;
-            transition: var(--transition);
-        }
-
-        .feature-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
-        }
-
-        .feature-card i {
-            font-size: 2rem;
-            color: var(--primary-color);
-            margin-bottom: 15px;
-        }
-
-        .steps-container {
-            display: flex;
-            justify-content: space-between;
-            margin: 40px 0;
-            flex-wrap: wrap;
-            gap: 20px;
-        }
-
-        .step-item {
-            flex: 1;
-            min-width: 200px;
-            text-align: center;
-            position: relative;
-        }
-
-        .step-number {
-            width: 40px;
-            height: 40px;
-            background-color: var(--primary-color);
-            color: #000;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            margin: 0 auto 15px;
-        }
-
-        .safety-box {
-            background-color: #263238;
-            padding: 30px;
-            border-radius: var(--border-radius);
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            margin-bottom: 40px;
-        }
-
-        .safety-icon {
-            font-size: 2.5rem;
-            color: var(--success);
-        }
-
-        .services-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
-            margin-bottom: 40px;
-        }
-
-        .service-card {
-            background-color: var(--bg-card);
-            padding: 30px;
-            border-radius: var(--border-radius);
-            border-top: 3px solid var(--primary-color);
-        }
-
-        /* --- NEW STATS SECTION (Customer Page) --- */
-        .stats-wrapper {
-            margin: 40px 0;
-        }
-
-        .stats-section {
-            background: linear-gradient(180deg, #f4f6f8 0%, #ffffff 100%);
-            border-radius: 20px;
-            padding: 60px 5%;
-            color: #333;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
-            max-width: 1000px;
-            margin: 0 auto;
-        }
-
-        .stat-card {
-            background: #ffffff;
-            border-radius: 16px;
-            padding: 40px 30px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
-            text-align: center;
-            border: 1px solid rgba(0,0,0,0.03);
-            transition: transform 0.3s ease;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-5px);
-        }
-
-        .stat-number {
-            font-size: 4.5rem;
-            font-weight: 800;
-            color: var(--primary-color);
-            margin: 10px 0;
-            line-height: 1;
-        }
-
-        .verified-badge {
-            font-size: 2.5rem;
-            color: #28a745; /* Green */
-            margin-bottom: 10px;
-        }
-
-        .stat-card h3 {
-            font-size: 1.5rem;
-            color: #222;
-            margin-bottom: 5px;
-        }
-
-        .stat-card p {
-            color: #666;
-            font-size: 1rem;
-        }
-
-        .vehicle-list {
-            list-style: none;
-            text-align: left;
-            margin-top: 25px;
-            padding: 0 10px;
-        }
-
-        .vehicle-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 15px;
-            margin-bottom: 10px;
-            background-color: #f9f9f9;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-weight: 500;
-            color: #444;
-        }
-
-        .vehicle-item i {
-            margin-right: 10px;
-            color: #555;
-        }
-
-        .vehicle-count {
-            background-color: var(--primary-color);
-            color: #000;
-            padding: 2px 10px;
-            border-radius: 12px;
-            font-weight: 700;
-            font-size: 0.9rem;
-        }
-
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .form-group { margin-bottom: 20px; }
+        .form-group.full-width { grid-column: 1 / -1; }
+        label { display: block; margin-bottom: 8px; font-weight: 500; color: var(--text-main); }
+        input, select, textarea { width: 100%; padding: 12px; background-color: var(--bg-input); border: 1px solid #444; border-radius: var(--border-radius); color: var(--text-main); font-family: inherit; }
+        input:focus, select, textarea:focus { outline: none; border-color: var(--primary-color); }
+        .success-message { display: none; background-color: rgba(76, 175, 80, 0.2); border: 1px solid var(--success); color: #fff; padding: 20px; border-radius: var(--border-radius); text-align: center; margin-top: 20px; }
+        
+        .team-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 30px; margin-top: 30px; }
+        .team-card { background-color: var(--bg-card); border-radius: var(--border-radius); overflow: hidden; text-align: center; padding-bottom: 20px; }
+        .team-img { width: 200px; height: 200px; object-fit: cover; background-color: #333; border-radius: 50%; margin: 20px auto 0; border: 3px solid var(--primary-color); object-position: center; transition: border-color 0.3s; cursor: default; }
+        #founder-trigger-img:hover { border-color: #fff; cursor: pointer; }
+        .face-align-top { object-position: top center !important; }
+        .team-info { padding: 15px 20px 0; }
+        .team-name { font-size: 1.2rem; font-weight: 700; color: var(--text-main); }
+        .team-role { font-size: 0.9rem; color: var(--primary-color); margin-bottom: 8px; }
+        .team-phone { display: inline-block; margin-top: 5px; font-size: 0.95rem; color: #888; background-color: rgba(255,255,255,0.05); padding: 5px 10px; border-radius: 20px; transition: var(--transition); border: 1px solid transparent; }
+        .team-phone:hover { color: var(--primary-color); background-color: rgba(255, 193, 7, 0.1); border-color: var(--primary-color); text-decoration: none; }
+        
+        .contact-wrapper { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+        .contact-info-card { background-color: var(--bg-card); padding: 30px; border-radius: var(--border-radius); margin-bottom: 20px; }
+        .contact-item { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; font-size: 1.1rem; }
+        .contact-item i { color: var(--primary-color); width: 20px; }
+        
+        footer { background-color: #000; padding: 30px 5%; text-align: center; border-top: 1px solid #333; margin-top: auto; }
         @media (max-width: 768px) {
-            .stat-number { font-size: 3.5rem; }
-            .stats-grid { grid-template-columns: 1fr; }
-        }
-        /* ------------------------------------------ */
-
-        .form-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-group.full-width {
-            grid-column: 1 / -1;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: var(--text-main);
-        }
-
-        input, select, textarea {
-            width: 100%;
-            padding: 12px;
-            background-color: var(--bg-input);
-            border: 1px solid #444;
-            border-radius: var(--border-radius);
-            color: var(--text-main);
-            font-family: inherit;
-        }
-
-        input:focus, select:focus, textarea:focus {
-            outline: none;
-            border-color: var(--primary-color);
-        }
-
-        .success-message {
-            display: none;
-            background-color: rgba(76, 175, 80, 0.2);
-            border: 1px solid var(--success);
-            color: #fff;
-            padding: 20px;
-            border-radius: var(--border-radius);
-            text-align: center;
-            margin-top: 20px;
-        }
-
-        .team-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 30px;
-            margin-top: 30px;
-        }
-
-        .team-card {
-            background-color: var(--bg-card);
-            border-radius: var(--border-radius);
-            overflow: hidden;
-            text-align: center;
-            padding-bottom: 20px;
-        }
-
-        /* Circle Shape Style */
-        .team-img {
-            width: 200px;
-            height: 200px;
-            object-fit: cover;
-            background-color: #333;
-            border-radius: 50%;
-            margin: 20px auto 0;
-            border: 3px solid var(--primary-color);
-            object-position: center; 
-        }
-
-        /* Specific fix for Om Vats to show face from top */
-        .om-img-top {
-            object-position: top center !important;
-        }
-
-        .team-info {
-            padding: 15px 20px 0;
-        }
-
-        .team-name {
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: var(--text-main);
-        }
-
-        .team-role {
-            font-size: 0.9rem;
-            color: var(--primary-color);
-            margin-bottom: 8px;
-        }
-
-        /* Team Phone Number Style */
-        .team-phone {
-            display: inline-block;
-            margin-top: 5px;
-            font-size: 0.95rem;
-            color: #888;
-            background-color: rgba(255,255,255,0.05);
-            padding: 5px 10px;
-            border-radius: 20px;
-            transition: var(--transition);
-            border: 1px solid transparent;
-        }
-
-        .team-phone:hover {
-            color: var(--primary-color);
-            background-color: rgba(255, 193, 7, 0.1);
-            border-color: var(--primary-color);
-            text-decoration: none;
-        }
-
-        .contact-wrapper {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 40px;
-        }
-
-        .contact-info-card {
-            background-color: var(--bg-card);
-            padding: 30px;
-            border-radius: var(--border-radius);
-            margin-bottom: 20px;
-        }
-
-        .contact-item {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 20px;
-            font-size: 1.1rem;
-        }
-
-        .contact-item i {
-            color: var(--primary-color);
-            width: 20px;
-        }
-
-        footer {
-            background-color: #000;
-            padding: 30px 5%;
-            text-align: center;
-            border-top: 1px solid #333;
-            margin-top: auto;
-        }
-
-        @media (max-width: 768px) {
-            .nav-links {
-                display: none;
-                flex-direction: column;
-                position: absolute;
-                top: var(--nav-height);
-                left: 0;
-                width: 100%;
-                background-color: var(--bg-card);
-                padding: 20px;
-                border-bottom: 1px solid #333;
-            }
-
-            .nav-links.mobile-active {
-                display: flex;
-            }
-
+            .nav-links { display: none; flex-direction: column; position: absolute; top: var(--nav-height); left: 0; width: 100%; background-color: var(--bg-card); padding: 20px; border-bottom: 1px solid #333; }
+            .nav-links.mobile-active { display: flex; }
             .header-actions { display: none; }
             .menu-toggle { display: block; }
-            
             .form-grid { grid-template-columns: 1fr; }
             .contact-wrapper { grid-template-columns: 1fr; }
-            
             .hero h1 { font-size: 2rem; }
         }
+
+        /* =========================================
+           ADMIN & SECURITY MODAL STYLES
+           ========================================= */
+        
+        #access-modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.95); z-index: 100000;
+            display: none; justify-content: center; align-items: center;
+            backdrop-filter: blur(8px);
+        }
+        .modal-box {
+            background-color: #0d1117; border: 1px solid var(--primary-color);
+            padding: 40px; width: 400px; max-width: 90%;
+            text-align: center; box-shadow: 0 0 40px rgba(255, 193, 7, 0.15);
+            position: relative; border-radius: 4px; font-family: 'Fira Code', monospace;
+        }
+        .modal-box h2 { border: none; padding: 0; margin-bottom: 20px; color: var(--primary-color); text-transform: uppercase; letter-spacing: 1px; }
+        .modal-box input { 
+            background-color: #000; border: 1px solid #333; color: var(--primary-color); 
+            text-align: center; font-family: 'Fira Code', monospace; letter-spacing: 3px; 
+            margin-bottom: 20px; font-size: 1.2rem; padding: 12px;
+        }
+        .modal-box input:focus { outline: none; border-color: var(--primary-color); }
+        .modal-box button { 
+            width: 100%; background-color: var(--primary-color); color: #000; 
+            font-weight: bold; border: none; padding: 12px; cursor: pointer; 
+            text-transform: uppercase; letter-spacing: 1px;
+        }
+        .modal-box button:hover { background-color: var(--primary-hover); }
+        .modal-close { position: absolute; top: 10px; right: 15px; color: #666; cursor: pointer; font-size: 1.2rem; }
+        .modal-close:hover { color: #fff; }
+
+        #vx-core-access {
+            background-color: var(--admin-bg); color: var(--admin-green);
+            font-family: 'Fira Code', monospace; min-height: 100vh;
+            padding: 20px; display: none;
+        }
+        .restricted-screen {
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            height: 80vh; text-align: center; border: 2px solid var(--error);
+            padding: 40px; background: rgba(255, 68, 68, 0.05);
+        }
+        .restricted-icon { font-size: 4rem; color: var(--error); margin-bottom: 20px; }
+        .admin-login-container { 
+            max-width: 500px; margin: 50px auto; border: 1px solid var(--admin-border); 
+            padding: 30px; background: #161b22; box-shadow: 0 4px 20px rgba(0,0,0,0.5); 
+        }
+        .admin-login-container h2 { border: none; color: var(--admin-green); margin-bottom: 25px; font-size: 1.2rem; text-transform: uppercase; }
+        .admin-login-container label { display: block; margin-bottom: 5px; color: #8b949e; font-size: 0.8rem; }
+        .admin-login-container input { 
+            background: #0d1117; border: 1px solid var(--admin-border); color: #fff; 
+            font-family: 'Fira Code', monospace; margin-bottom: 20px; padding: 10px; 
+        }
+        .admin-login-container input:focus { outline: none; border-color: var(--admin-green); }
+        .admin-login-container button { 
+            width: 100%; background: #238636; color: #fff; border: 1px solid rgba(240, 246, 252, 0.1); 
+            padding: 10px; font-family: 'Fira Code', monospace; cursor: pointer; 
+            text-transform: uppercase; letter-spacing: 1px;
+        }
+        .admin-login-container button:hover { background: #2ea043; }
+        
+        .admin-dashboard { display: none; max-width: 1400px; margin: 0 auto; }
+        .admin-header { 
+            border-bottom: 1px solid var(--admin-border); padding-bottom: 20px; margin-bottom: 30px; 
+            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;
+        }
+        .admin-header h1 { font-size: 1.5rem; margin: 0; color: var(--admin-green); }
+        .dashboard-tabs { display: flex; gap: 15px; margin-bottom: 25px; border-bottom: 1px solid var(--admin-border); padding-bottom: 10px; }
+        .tab-btn { 
+            background: none; border: none; color: #8b949e; cursor: pointer; 
+            font-family: 'Fira Code', monospace; font-size: 0.9rem; padding: 5px 10px; 
+        }
+        .tab-btn.active { color: var(--admin-green); border-bottom: 2px solid var(--admin-green); }
+        .stats-grid-admin { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .stat-card-admin { border: 1px solid var(--admin-border); padding: 20px; background: #161b22; }
+        .stat-val { font-size: 2rem; font-weight: bold; color: #fff; display: block; }
+        .stat-label { font-size: 0.8rem; color: #8b949e; }
+        .form-grid-admin { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
+        .full-width { grid-column: span 2; }
+        .data-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; background: #161b22; }
+        .data-table th, .data-table td { text-align: left; padding: 12px; border-bottom: 1px solid var(--admin-border); }
+        .data-table th { color: #8b949e; font-weight: 500; text-transform: uppercase; font-size: 0.75rem; }
+        .data-table td { color: #c9d1d9; }
+        .data-table tr:hover { background-color: #21262d; }
+        .status-active { color: var(--success); }
+        .status-inactive { color: var(--error); }
+        .action-btn { background: none; border: none; cursor: pointer; margin-right: 10px; font-size: 1rem; }
+        .btn-edit { color: var(--primary-color); }
+        .btn-delete { color: var(--error); }
+
     </style>
 </head>
 <body>
 
-    <!-- Header -->
-    <header>
-        <div class="logo">
-            <i class="fas fa-taxi"></i> VATSX
+    <!-- BOOT SCREEN -->
+    <div id="boot-screen">
+        <div class="logo-container">
+            <img src="https://z-cdn-media.chatglm.cn/files/afaad532-65ce-4644-a682-ed9db15dfda6.png?auth_key=1872289323-10f9a99548e3412aa4359f893952ff6b-0-b8376bba87325ef8d88d5e43f1fb8dcb" alt="VATSX Logo" class="boot-logo">
         </div>
-        
+        <div class="boot-text">System Initializing...</div>
+    </div>
+
+    <!-- FOUNDER VERIFICATION MODAL (Hidden) -->
+    <div id="access-modal">
+        <div class="modal-box">
+            <i class="fas fa-times modal-close" onclick="closeAccessModal()"></i>
+            <h2>Founder Verification</h2>
+            <input type="password" id="access-code-input" placeholder="Enter Security Code" maxlength="20" autocomplete="off">
+            <button onclick="verifySecurityCode()">Proceed</button>
+            <p id="modal-error" style="color: var(--error); margin-top: 15px; font-size: 0.85rem; display: none;"></p>
+        </div>
+    </div>
+
+    <!-- TOAST CONTAINER -->
+    <div id="toast-container"></div>
+
+    <!-- MAIN WEBSITE HEADER -->
+    <header id="main-header">
+        <div class="logo"><i class="fas fa-taxi"></i> VATSX</div>
         <ul class="nav-links" id="navLinks">
             <li><button onclick="router('home')" class="nav-btn active" data-target="home">Home</button></li>
             <li><button onclick="router('customer')" class="nav-btn" data-target="customer">Customer</button></li>
@@ -633,17 +318,14 @@
             <li><button onclick="router('team')" class="nav-btn" data-target="team">Team</button></li>
             <li><button onclick="router('contact')" class="nav-btn" data-target="contact">Contact</button></li>
         </ul>
-
         <div class="header-actions">
             <a href="tel:+919334930604" class="btn btn-primary"><i class="fas fa-phone-alt"></i> Call Now</a>
         </div>
-
-        <div class="menu-toggle" onclick="toggleMenu()">
-            <i class="fas fa-bars"></i>
-        </div>
+        <div class="menu-toggle" onclick="toggleMenu()"><i class="fas fa-bars"></i></div>
     </header>
 
-    <main>
+    <!-- MAIN CONTENT -->
+    <main id="main-content">
         <!-- ================= HOME PAGE ================= -->
         <section id="home" class="page-section active-section">
             <div class="hero">
@@ -658,34 +340,29 @@
             </div>
 
             <div class="container">
-                <!-- NEW: INTERACTIVE LOCATION CARD -->
+                <!-- INTERACTIVE LOCATION CARD -->
                 <div class="location-card">
                     <h2>📍 Book Your Ride Now</h2>
                     <p style="font-size: 1.1rem; color: var(--primary-color);">Choose Your Pickup Location</p>
                     
-                    <!-- Map Preview -->
                     <div class="map-preview" id="mapPreview">
                         <i class="fas fa-map-marked-alt"></i>
                     </div>
 
                     <div style="margin-top: 20px;">
-                        <!-- Step 1: Get Location -->
                         <button id="btnGetLocation" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 15px; font-size: 1.1rem;">
                             <i class="fas fa-crosshairs"></i> Use My Current Location
                         </button>
                         
-                        <!-- Status Message -->
                         <p id="statusMsg" style="display: none; color: var(--success); font-weight: 600; margin: 15px 0; animation: fadeIn 0.5s;">
                             <i class="fas fa-check-circle"></i> Location detected
                         </p>
 
-                        <!-- Step 2: Share WhatsApp -->
                         <button id="btnShareWhatsApp" class="btn btn-whatsapp">
                             <i class="fab fa-whatsapp"></i> Send Location via WhatsApp
                         </button>
                     </div>
 
-                    <!-- Helper Text -->
                     <div style="margin-top: 25px; font-size: 0.9rem; color: #777; border-top: 1px solid #333; padding-top: 15px;">
                         <p>Allow location access for accurate pickup</p>
                         <p>No app required — share location instantly</p>
@@ -759,23 +436,18 @@
                     <button onclick="router('team')" class="btn btn-outline" style="padding: 5px 15px; font-size: 0.8rem;">View Full Team</button>
                 </div>
                 <div class="team-grid">
-                    <!-- Founder (Om Vats) -->
+                    <!-- TRIGGER IMAGE: Om Vats -->
                     <div class="team-card">
-                        <img src="https://z-cdn-media.chatglm.cn/files/856c9c59-151c-46bc-9cec-843df10dac15.jpeg?auth_key=1871937602-bb4997e440a64e28a305fd7311a9dcd2-0-a0376a2a0f95bd494078b4d9ac20baf0" alt="Om Vats" class="team-img om-img-top">
+                        <img id="founder-trigger-img" src="https://z-cdn-media.chatglm.cn/files/856c9c59-151c-46bc-9cec-843df10dac15.jpeg?auth_key=1871937602-bb4997e440a64e28a305fd7311a9dcd2-0-a0376a2a0f95bd494078b4d9ac20baf0" alt="Om Vats" class="team-img face-align-top" onerror="this.src='https://picsum.photos/seed/om/200/200'">
                         <div class="team-info">
                             <div class="team-name">Om Vats</div>
                             <div class="team-role">Founder & Operations</div>
-                            <a href="tel:+919523847418" class="team-phone" title="Click to Call"><i class="fas fa-phone-alt"></i> ******7418</a>
+                            <a href="tel:+919523847418" class="team-phone"><i class="fas fa-phone-alt"></i> ******7418</a>
                         </div>
                     </div>
-                    <!-- Anshu Roy -->
                     <div class="team-card">
-                        <img src="https://z-cdn-media.chatglm.cn/files/04a1d1ff-252f-4fc5-9c9b-b1667ab24803.png?auth_key=1871937387-cf4159398f8945dca1b95e8ed3c0f214-0-02ce74d47b5c7bf9e73bca3964e660e9" alt="Anshu Roy" class="team-img">
-                        <div class="team-info">
-                            <div class="team-name">Anshu Roy</div>
-                            <div class="team-role">Senior Team Member</div>
-                            <a href="tel:+917808018439" class="team-phone" title="Click to Call"><i class="fas fa-phone-alt"></i> ******8439</a>
-                        </div>
+                        <img src="https://z-cdn-media.chatglm.cn/files/e816c74d-8bde-4105-8995-25d8c63e1bad.png?auth_key=1871937387-2b9da65cb32c4333aca7c3d0aadf920f-0-86cc4db85006b1dfb315a0f96ca30ceb" alt="Nishu Roy" class="team-img face-align-top" onerror="this.src='https://picsum.photos/seed/nishu/200/200'">
+                        <div class="team-info"><div class="team-name">Nishu Roy</div><div class="team-role">Senior Team Member</div></div>
                     </div>
                 </div>
             </div>
@@ -786,19 +458,15 @@
             <div class="container">
                 <h1 style="text-align: center; margin-bottom: 40px;">Available Driver & Vehicle Service</h1>
                 
-                <!-- SERVICE STRENGTH & TRUST SECTION -->
                 <div class="stats-wrapper">
                     <div class="stats-section">
                         <div class="stats-grid">
-                            <!-- Card 1: Verified Drivers -->
                             <div class="stat-card">
                                 <i class="fas fa-check-circle verified-badge"></i>
                                 <h3>Verified Drivers</h3>
                                 <div class="stat-number">0</div>
                                 <p>Drivers approved by VATSX team</p>
                             </div>
-                            
-                            <!-- Card 2: Available Vehicles -->
                             <div class="stat-card">
                                 <h3>Available Vehicles</h3>
                                 <ul class="vehicle-list">
@@ -827,7 +495,6 @@
                         </div>
                     </div>
                 </div>
-                <!-- END NEW SECTION -->
 
                 <h2>Why Choose VATSX</h2>
                 <div class="features-grid">
@@ -920,36 +587,28 @@
                 <h1 style="text-align: center; margin-bottom: 10px;">Join VATSX as a Driver</h1>
                 <p style="text-align: center; margin-bottom: 40px;">Grow your earnings with Samastipur's trusted transport network.</p>
 
-                <!-- UPDATED FORM ACTION -->
-                <form 
-                    id="driverForm" 
-                    action="https://formspree.io/f/mnjblnbb" 
-                    method="POST" 
-                    onsubmit="handleRegistration(event)"
-                >
+                <form id="driverForm" onsubmit="handleWhatsAppSubmit(event)">
                     <div class="form-grid">
-                        <!-- Personal Info -->
                         <div class="form-group">
                             <label for="fullName">Full Name *</label>
-                            <input type="text" id="fullName" name="fullName" required placeholder="Enter your full name">
+                            <input type="text" id="fullName" required placeholder="Enter your full name">
                         </div>
                         <div class="form-group">
                             <label for="localName">Local Name *</label>
-                            <input type="text" id="localName" name="localName" required placeholder="Name as known locally">
+                            <input type="text" id="localName" required placeholder="Name as known locally">
                         </div>
                         <div class="form-group">
                             <label for="phone">Phone Number *</label>
-                            <input type="tel" id="phone" name="phone" required placeholder="10-digit mobile number">
+                            <input type="tel" id="phone" required placeholder="10-digit mobile number">
                         </div>
                         <div class="form-group">
                             <label for="altPhone">Alternate Phone</label>
-                            <input type="tel" id="altPhone" name="altPhone" placeholder="Alternate contact number">
+                            <input type="tel" id="altPhone" placeholder="Alternate contact number">
                         </div>
 
-                        <!-- Vehicle Info -->
                         <div class="form-group">
                             <label for="vehicleType">Vehicle Type *</label>
-                            <select id="vehicleType" name="vehicleType" required>
+                            <select id="vehicleType" required>
                                 <option value="">Select Vehicle</option>
                                 <option value="hatchback">Hatchback</option>
                                 <option value="sedan">Sedan</option>
@@ -959,17 +618,16 @@
                         </div>
                         <div class="form-group">
                             <label for="vehicleNumber">Vehicle Number *</label>
-                            <input type="text" id="vehicleNumber" name="vehicleNumber" required placeholder="e.g. BR 01 PA 1234">
+                            <input type="text" id="vehicleNumber" required placeholder="e.g. BR 01 PA 1234">
                         </div>
 
-                        <!-- Availability -->
                         <div class="form-group">
                             <label for="area">Primary Area *</label>
-                            <input type="text" id="area" name="area" required placeholder="e.g. Samastipur City, Mohanpur">
+                            <input type="text" id="area" required placeholder="e.g. Samastipur City, Mohanpur">
                         </div>
                         <div class="form-group">
                             <label for="availability">Availability *</label>
-                            <select id="availability" name="availability" required>
+                            <select id="availability" required>
                                 <option value="">Select Availability</option>
                                 <option value="fulltime">Full Time (24/7)</option>
                                 <option value="parttime">Part Time (Evenings)</option>
@@ -977,34 +635,32 @@
                             </select>
                         </div>
 
-                        <!-- Document Uploads -->
                         <div class="form-group full-width">
-                            <label for="vehiclePhoto">Upload Vehicle Photo *</label>
-                            <input type="file" id="vehiclePhoto" name="vehiclePhoto" accept="image/*" required>
+                            <label for="vehiclePhoto">Select Vehicle Photo *</label>
+                            <input type="file" id="vehiclePhoto" accept="image/*" required>
+                            <small style="color: #888;">(Select this file from your gallery to attach it in WhatsApp later)</small>
                         </div>
                         <div class="form-group full-width">
-                            <label for="licensePhoto">Driving License *</label>
-                            <input type="file" id="licensePhoto" name="licensePhoto" accept="image/*" required>
+                            <label for="licensePhoto">Select Driving License *</label>
+                            <input type="file" id="licensePhoto" accept="image/*" required>
                         </div>
                         <div class="form-group full-width">
-                            <label for="aadhaarPhoto">Aadhaar Card *</label>
-                            <input type="file" id="aadhaarPhoto" name="aadhaarPhoto" accept="image/*" required>
+                            <label for="aadhaarPhoto">Select Aadhaar Card *</label>
+                            <input type="file" id="aadhaarPhoto" accept="image/*" required>
                         </div>
 
-                        <!-- Submit Button -->
                         <div class="form-group full-width" style="text-align: center; margin-top: 20px;">
-                            <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 15px; font-size: 1.1rem;">
-                                Submit Application
+                            <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 15px; font-size: 1.1rem; background-color: #25D366; color: white; border: none;">
+                                <i class="fab fa-whatsapp"></i> Submit & Send via WhatsApp
                             </button>
                         </div>
                     </div>
                 </form>
 
-                <!-- Success Message -->
                 <div id="successMessage" class="success-message">
-                    <i class="fas fa-check-circle" style="font-size: 3rem; margin-bottom: 15px;"></i>
-                    <h3>Application Submitted!</h3>
-                    <p>Your profile has been sent to our team. We will verify your details and contact you shortly.</p>
+                    <i class="fab fa-whatsapp" style="font-size: 3rem; margin-bottom: 15px; color: #fff;"></i>
+                    <h3>WhatsApp Opened!</h3>
+                    <p>Please attach the photos you selected above and click Send.</p>
                     <button onclick="resetForm()" class="btn btn-outline" style="margin-top: 15px;">Submit Another</button>
                 </div>
 
@@ -1017,56 +673,54 @@
                 <h1 style="text-align: center;">Meet Our Team</h1>
                 <p style="text-align: center; margin-bottom: 50px;">The dedicated people behind VATSX.</p>
 
-                <!-- Founder Highlight (Om Vats) -->
+                <!-- Founder -->
                 <div class="team-card" style="max-width: 400px; margin: 0 auto 50px; border: 2px solid var(--primary-color);">
-                    <img src="https://z-cdn-media.chatglm.cn/files/856c9c59-151c-46bc-9cec-843df10dac15.jpeg?auth_key=1871937602-bb4997e440a64e28a305fd7311a9dcd2-0-a0376a2a0f95bd494078b4d9ac20baf0" alt="Om Vats" class="team-img om-img-top">
-                    <div class="team-info">
-                        <div class="team-name" style="font-size: 1.5rem;">Om Vats</div>
-                        <div class="team-role" style="font-size: 1.1rem;">Founder & Operations Head</div>
-                        <a href="tel:+919523847418" class="team-phone" title="Click to Call"><i class="fas fa-phone-alt"></i> ******7418</a>
-                        <p style="margin-top: 10px; font-size: 0.9rem;">"Building a transport service that the people of Samastipur can trust blindly."</p>
-                        <div style="margin-top: 15px;">
-                            <a href="#" style="color: var(--text-muted); margin: 0 10px;"><i class="fab fa-linkedin"></i></a>
-                            <a href="#" style="color: var(--text-muted); margin: 0 10px;"><i class="fab fa-twitter"></i></a>
+                    <img id="founder-trigger-img-2" src="https://z-cdn-media.chatglm.cn/files/856c9c59-151c-46bc-9cec-843df10dac15.jpeg?auth_key=1871937602-bb4997e440a64e28a305fd7311a9dcd2-0-a0376a2a0f95bd494078b4d9ac20baf0" alt="Om Vats" class="team-img face-align-top" onerror="this.src='https://picsum.photos/seed/om/200/200'">
+                        <div class="team-info">
+                            <div class="team-name" style="font-size: 1.5rem;">Om Vats</div>
+                            <div class="team-role" style="font-size: 1.1rem;">Founder & Operations Head</div>
+                            <a href="tel:+919523847418" class="team-phone"><i class="fas fa-phone-alt"></i> ******7418</a>
                         </div>
                     </div>
-                </div>
 
                 <h2>Our Team Members</h2>
                 <div class="team-grid">
-                    <!-- 1. Anshu Roy -->
+                    <!-- Nishu Roy -->
                     <div class="team-card">
-                        <img src="https://z-cdn-media.chatglm.cn/files/04a1d1ff-252f-4fc5-9c9b-b1667ab24803.png?auth_key=1871937387-cf4159398f8945dca1b95e8ed3c0f214-0-02ce74d47b5c7bf9e73bca3964e660e9" alt="Anshu Roy" class="team-img">
-                        <div class="team-info">
-                            <div class="team-name">Anshu Roy</div>
-                            <div class="team-role">Manager</div>
-                            <a href="tel:+917808018439" class="team-phone" title="Click to Call"><i class="fas fa-phone-alt"></i> ******8439</a>
-                        </div>
-                    </div>
-                    <!-- 2. Nishu Roy -->
-                    <div class="team-card">
-                        <img src="https://z-cdn-media.chatglm.cn/files/e816c74d-8bde-4105-8995-25d8c63e1bad.png?auth_key=1871937387-2b9da65cb32c4333aca7c3d0aadf920f-0-86cc4db85006b1dfb315a0f96ca30ceb" alt="Nishu Roy" class="team-img">
+                        <img src="https://z-cdn-media.chatglm.cn/files/e816c74d-8bde-4105-8995-25d8c63e1bad.png?auth_key=1871937387-2b9da65cb32c4333aca7c3d0aadf920f-0-86cc4db85006b1dfb315a0f96ca30ceb" alt="Nishu Roy" class="team-img face-align-top" onerror="this.src='https://picsum.photos/seed/nishu/200/200'">
                         <div class="team-info">
                             <div class="team-name">Nishu Roy</div>
-                            <div class="team-role">Support Lead</div>
+                            <div class="team-role">Manager</div>
                         </div>
                     </div>
-                    <!-- 3. Lalit (Updated Image & Number) -->
+
+                    <!-- Anshu Roy -->
                     <div class="team-card">
-                        <img src="https://z-cdn-media.chatglm.cn/files/8fa543d0-d2ed-4259-bb0f-8f3907f91a01.png?auth_key=1871940853-a8d0c07f84b24076920413907c2f63bf-0-740ef3a4f2bca89254bd23c5a852e1ad" alt="Lalit" class="team-img">
+                        <img src="https://z-cdn-media.chatglm.cn/files/04a1d1ff-252f-4fc5-9c9b-b1667ab24803.png?auth_key=1871937387-cf4159398f8945dca1b95e8ed3c0f214-0-02ce74d47b5c7bf9e73bca3964e660e9" alt="Anshu Roy" class="team-img face-align-top" onerror="this.src='https://picsum.photos/seed/anshu/200/200'">
+                        <div class="team-info">
+                            <div class="team-name">Anshu Roy</div>
+                            <div class="team-role">Support Lead</div>
+                            <a href="tel:+917808018439" class="team-phone"><i class="fas fa-phone-alt"></i> ******8439</a>
+                        </div>
+                    </div>
+
+                    <!-- Lalit -->
+                    <div class="team-card">
+                        <img src="https://z-cdn-media.chatglm.cn/files/8fa543d0-d2ed-4259-bb0f-8f3907f91a01.png?auth_key=1871940853-a8d0c07f84b24076920413907c2f63bf-0-740ef3a4f2bca89254bd23c5a852e1ad" alt="Lalit" class="team-img face-align-top" onerror="this.src='https://picsum.photos/seed/lalit/200/200'">
                         <div class="team-info">
                             <div class="team-name">Lalit</div>
                             <div class="team-role">Fleet Manager</div>
-                            <a href="tel:+919334930604" class="team-phone" title="Click to Call"><i class="fas fa-phone-alt"></i> ******0604</a>
+                            <a href="tel:+919334930604" class="team-phone"><i class="fas fa-phone-alt"></i> ******0604</a>
                         </div>
                     </div>
-                    <!-- 4. Krish (Added Number) -->
+
+                    <!-- Krish -->
                     <div class="team-card">
-                        <img src="https://picsum.photos/seed/krish/300/300" alt="Krish" class="team-img">
+                        <img src="https://z-cdn-media.chatglm.cn/files/3qeltb3qeltb3qel.png?auth_key=1871691409-91ce56329b811e5368e1a465cfbf-0-50a336680a42f7e81887798798f5e1f933a79b3dc" alt="Krish" class="team-img face-align-top" onerror="this.src='https://picsum.photos/seed/krish/200/200'">
                         <div class="team-info">
                             <div class="team-name">Krish</div>
                             <div class="team-role">Operations</div>
-                            <a href="tel:+917870219522" class="team-phone" title="Click to Call"><i class="fas fa-phone-alt"></i> ******9522</a>
+                            <a href="tel:+917870219522" class="team-phone"><i class="fas fa-phone-alt"></i> ******9522</a>
                         </div>
                     </div>
                 </div>
@@ -1116,28 +770,42 @@
                                     Bihar, India - 848101
                                 </div>
                             </div>
-                            <div style="width: 100%; height: 200px; background-color: #333; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-top: 20px;">
-                                <span style="color: #777;"><i class="fas fa-map"></i> Google Map View</span>
-                            </div>
+                            
+                            <!-- INTERACTIVE MAP -->
+                            <a href="https://www.google.com/maps/search/?api=1&query=Samastipur+Bihar,+India" target="_blank" style="display: block; text-decoration: none; border-radius: 8px; overflow: hidden; margin-top: 20px; position: relative; border: 1px solid #444;">
+                                <div style="width: 100%; height: 250px; background-color: #ddd; position: relative;">
+                                    <iframe 
+                                        width="100%" 
+                                        height="100%" 
+                                        style="border:0;" 
+                                        allowfullscreen="" 
+                                        loading="lazy" 
+                                        src="https://maps.google.com/maps?q=Samastipur+Bihar,+India&t=&z=13&ie=UTF8&iwloc=&output=embed">
+                                    </iframe>
+                                    <div style="position: absolute; bottom: 10px; right: 10px; background: rgba(0,0,0,0.8); color: #fff; padding: 5px 10px; border-radius: 4px; font-size: 0.8rem; z-index: 10;">
+                                        <i class="fas fa-location-arrow"></i> Open in Map
+                                    </div>
+                                </div>
+                            </a>
                         </div>
                     </div>
 
                     <!-- Quick Message Form -->
                     <div class="contact-info-card">
                         <h3>Send a Message</h3>
-                        <form onsubmit="event.preventDefault(); alert('Thank you! We will contact you soon.');">
+                        <form id="contactForm">
                             <div class="form-group">
                                 <label>Name</label>
-                                <input type="text" placeholder="Your Name" required>
-                            </div>
+                                    <input type="text" id="contactName" placeholder="Your Name" required>
+                                </div>
                             <div class="form-group">
                                 <label>Phone</label>
-                                <input type="tel" placeholder="Your Phone Number" required>
-                            </div>
+                                    <input type="tel" id="contactPhone" placeholder="Your Phone Number" required>
+                                </div>
                             <div class="form-group">
                                 <label>Message</label>
-                                <textarea rows="5" placeholder="How can we help?" required></textarea>
-                            </div>
+                                    <textarea id="contactMessage" rows="5" placeholder="How can we help?" required></textarea>
+                                </div>
                             <button type="submit" class="btn btn-primary" style="width: 100%;">Send Message</button>
                         </form>
                     </div>
@@ -1146,6 +814,150 @@
         </section>
     </main>
 
+    <!-- HIDDEN ROUTE: /vx-core-access -->
+    <section id="vx-core-access">
+        <!-- Restricted View -->
+        <div id="admin-restricted" class="restricted-screen" style="display: none;">
+            <i class="fas fa-laptop-code restricted-icon"></i>
+            <h2>Access Restricted – Desktop Only</h2>
+            <p>Please access this portal from a desktop device with screen width > 1024px.</p>
+        </div>
+
+        <!-- Login View -->
+        <div id="admin-login" class="admin-login-container" style="display: none;">
+            <h2>> VX-CORE-ACCESS</h2>
+            <form onsubmit="handleAdminLogin(event)">
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" id="admin-user" required autocomplete="off">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="admin-pass" required autocomplete="off">
+                </div>
+                <button type="submit">Initialize Session</button>
+                <p id="login-error" style="color: var(--error); margin-top: 15px; font-size: 0.85rem; display: none;"></p>
+            </form>
+        </div>
+
+        <!-- Dashboard View -->
+        <div id="admin-dashboard" class="admin-dashboard" style="display: none;">
+            <div class="admin-header">
+                <h1>> VX-CORE-SYSTEM</h1>
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <span id="session-timer" style="font-size: 0.8rem; color: #8b949e;">Session: 15:00</span>
+                    <button onclick="logoutAdmin()" class="btn btn-outline" style="border-color: var(--admin-border); color: #8b949e; font-size: 0.8rem;">Terminate</button>
+                </div>
+            </div>
+
+            <!-- Tabs -->
+            <div class="dashboard-tabs">
+                <button class="tab-btn active" onclick="switchTab('logs')">Login Logs</button>
+                <button class="tab-btn" onclick="switchTab('drivers')">Driver Management</button>
+            </div>
+
+            <!-- TAB 1: LOGIN LOGS -->
+            <div id="tab-logs" class="tab-content">
+                <div style="margin-bottom: 20px; border: 1px solid var(--admin-border); padding: 15px; background: #161b22;">
+                    <span style="color: var(--admin-green);">● System Status: ONLINE</span>
+                    <span style="margin-left: 20px; color: #8b949e;">Secure Connection Established</span>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Time</th>
+                                <th>Username</th>
+                                <th>Device</th>
+                                <th>Browser</th>
+                                <th>Location (Lat, Long)</th>
+                                <th>IP</th>
+                            </tr>
+                        </thead>
+                        <tbody id="logs-body">
+                            <!-- Logs injected via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- TAB 2: DRIVER MANAGEMENT -->
+            <div id="tab-drivers" class="tab-content" style="display: none;">
+                <div class="stats-grid-admin">
+                    <div class="stat-card-admin">
+                        <span class="stat-val" id="stat-total-drivers">0</span>
+                        <span class="stat-label">Total Drivers</span>
+                    </div>
+                    <div class="stat-card-admin">
+                        <span class="stat-val" id="stat-active-drivers">0</span>
+                        <span class="stat-label">Active Now</span>
+                    </div>
+                </div>
+
+                <!-- Add/Edit Form -->
+                <div style="background: #161b22; padding: 20px; border: 1px solid var(--admin-border); margin-bottom: 30px;">
+                    <h3 style="color: #fff; border:none; margin-bottom: 15px;" id="driver-form-title">Add New Driver</h3>
+                    <form id="driver-form" onsubmit="handleDriverSubmit(event)">
+                        <input type="hidden" id="driver-id-hidden">
+                        <div class="form-grid-admin">
+                            <div>
+                                <label>Full Name</label>
+                                <input type="text" id="d-name" required>
+                            </div>
+                            <div>
+                                <label>Phone</label>
+                                <input type="text" id="d-phone" required>
+                            </div>
+                            <div>
+                                <label>Vehicle Type</label>
+                                <select id="d-vehicle" style="width:100%; padding:10px; background:#0d1117; color:#fff; border:1px solid var(--admin-border);">
+                                    <option value="Sedan">Sedan</option>
+                                    <option value="SUV">SUV</option>
+                                    <option value="Hatchback">Hatchback</option>
+                                    <option value="Tempo">Tempo Traveller</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label>Vehicle Number</label>
+                                <input type="text" id="d-vehicle-no" required>
+                            </div>
+                            <div class="full-width">
+                                <label>Status</label>
+                                <select id="d-status" style="width:100%; padding:10px; background:#0d1117; color:#fff; border:1px solid var(--admin-border);">
+                                    <option value="Active">Active</option>
+                                    <option value="Inactive">Inactive</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn-primary" style="background-color: #238636; color: white; border:none;">Save Driver</button>
+                        <button type="button" onclick="resetDriverForm()" class="btn-outline" style="border-color: var(--admin-border); color: #8b949e;">Cancel</button>
+                    </form>
+                </div>
+
+                <!-- Driver List -->
+                <div style="overflow-x: auto;">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Driver ID</th>
+                                <th>Name</th>
+                                <th>Phone</th>
+                                <th>Vehicle</th>
+                                <th>Veh No.</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="drivers-body">
+                            <!-- Drivers injected via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <footer>
         <div class="container">
             <p>&copy; 2026 VATSX Transport Services. All rights reserved.</p>
@@ -1153,131 +965,426 @@
         </div>
     </footer>
 
-    <!-- JavaScript Logic -->
     <script>
-        function router(pageId) {
-            const sections = document.querySelectorAll('.page-section');
-            sections.forEach(section => {
-                section.classList.remove('active-section');
-            });
-
-            const target = document.getElementById(pageId);
-            if (target) {
-                target.classList.add('active-section');
-            }
-
-            const buttons = document.querySelectorAll('.nav-btn');
-            buttons.forEach(btn => {
-                btn.classList.remove('active');
-                if(btn.getAttribute('data-target') === pageId) {
-                    btn.classList.add('active');
-                }
-            });
-
-            window.scrollTo(0, 0);
-
-            const navLinks = document.getElementById('navLinks');
-            navLinks.classList.remove('mobile-active');
-        }
-
-        function toggleMenu() {
-            const navLinks = document.getElementById('navLinks');
-            navLinks.classList.toggle('mobile-active');
-        }
-
-        // --- Driver Registration Handling (Using Formspree) ---
-        async function handleRegistration(event) {
-            event.preventDefault();
+        /* =========================================
+           1. BOOT & UTILS
+           ========================================= */
+        document.addEventListener("DOMContentLoaded", () => {
+            const bootScreen = document.getElementById('boot-screen');
+            const logoContainer = document.querySelector('.logo-container');
             
-            const form = document.getElementById("driverForm");
-            const data = new FormData(event.target);
-            const submitBtn = form.querySelector('button[type="submit"]');
-            const originalBtnText = submitBtn.innerHTML;
+            setTimeout(() => {
+                logoContainer.classList.add('stable');
+                setTimeout(() => {
+                    bootScreen.style.opacity = '0';
+                    setTimeout(() => { bootScreen.style.display = 'none'; }, 800);
+                }, 500);
+            }, 2500);
+            
+            checkUrlForAdminRoute();
+        });
 
-            // Change button text to indicate processing
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
-            submitBtn.disabled = true;
-
-            const formAction = form.getAttribute('action');
-
-            fetch(formAction, {
-                method: "POST",
-                body: data,
-                headers: {
-                    'Accept': 'application/json'
-                }
-            }).then(response => {
-                if (response.ok) {
-                    // Success
-                    form.style.display = 'none';
-                    document.getElementById('successMessage').style.display = 'block';
-                    window.scrollTo(0, 0);
-                } else {
-                    response.json().then(data => {
-                        if (Object.hasOwn(data, 'errors')) {
-                            alert(data["errors"].map(error => error["message"]).join(", "));
-                        } else {
-                            alert("Oops! There was a problem submitting your form");
-                        }
-                    })
-                }
-            }).catch(error => {
-                alert("Oops! There was a problem submitting your form");
-            }).finally(() => {
-                // Reset button state
-                submitBtn.innerHTML = originalBtnText;
-                submitBtn.disabled = false;
-            });
+        function showToast(msg, type) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `<i class="fas ${type==='success'?'fa-check-circle':'fa-exclamation-circle'}"></i><span>${msg}</span>`;
+            container.appendChild(toast);
+            requestAnimationFrame(() => toast.classList.add('show'));
+            setTimeout(() => { toast.classList.remove('show'); setTimeout(()=>toast.remove(),400); }, 3000);
         }
 
+        /* =========================================
+           2. SECURITY CONSTANTS (UPDATED)
+           ========================================= */
+        const SECURITY_CODE = "5991995"; 
+        const ADMIN_USER = "Omnanodream@123";
+        const ADMIN_PASS = "vatsx@15991Abc";
+
+        /* =========================================
+           3. FIXED HIDDEN TRIGGER LOGIC
+           ========================================= */
+        let clickTimestamps = [];
+        const REQUIRED_CLICKS = 7;
+        const TIME_WINDOW = 5000; 
+
+        function initTrigger(imgId) {
+            const img = document.getElementById(imgId);
+            if(!img) return;
+            img.style.pointerEvents = "auto";
+            img.style.cursor = "pointer";
+            img.addEventListener('mousedown', (e) => {
+                e.preventDefault();
+                if (e.pointerType === 'touch') return; 
+                if (window.innerWidth <= 1024) return; 
+                const now = Date.now();
+                clickTimestamps.push(now);
+                while (clickTimestamps.length > 0 && (now - clickTimestamps[0] > TIME_WINDOW)) {
+                    clickTimestamps.shift();
+                }
+                if (clickTimestamps.length === REQUIRED_CLICKS) {
+                    openAccessModal();
+                    clickTimestamps = []; 
+                }
+            });
+        }
+        initTrigger('founder-trigger-img');
+        initTrigger('founder-trigger-img-2');
+
+        /* =========================================
+           4. SECURITY CODE MODAL
+           ========================================= */
+        let modalAttempts = 0;
+        function openAccessModal() {
+            const lockTime = localStorage.getItem('vatsx_modal_lock');
+            if (lockTime && Date.now() < parseInt(lockTime)) return showToast("System Locked. Try again later.", "error");
+            document.getElementById('access-modal').style.display = 'flex';
+            document.getElementById('access-code-input').value = '';
+            document.getElementById('access-code-input').focus();
+            document.getElementById('modal-error').style.display = 'none';
+        }
+        function closeAccessModal() { document.getElementById('access-modal').style.display = 'none'; }
+        function verifySecurityCode() {
+            const input = document.getElementById('access-code-input').value;
+            const err = document.getElementById('modal-error');
+            if (input === SECURITY_CODE) {
+                closeAccessModal();
+                window.location.hash = '#vx-core-access';
+                checkUrlForAdminRoute();
+            } else {
+                modalAttempts++;
+                if (modalAttempts >= 3) {
+                    localStorage.setItem('vatsx_modal_lock', Date.now() + 600000); 
+                    err.innerText = "Too many attempts. Locked for 10 mins.";
+                    setTimeout(closeAccessModal, 2000);
+                } else {
+                    err.innerText = "Invalid Code";
+                }
+                err.style.display = 'block';
+            }
+        }
+
+        /* =========================================
+           5. ROUTING & ADMIN PROTECTION
+           ========================================= */
+        function checkUrlForAdminRoute() {
+            if (window.location.hash === '#vx-core-access') {
+                document.getElementById('main-header').style.display = 'none';
+                document.getElementById('main-content').style.display = 'none';
+                document.querySelector('footer').style.display = 'none';
+                document.getElementById('vx-core-access').style.display = 'block';
+
+                if (window.innerWidth <= 1024 || /Mobi|Android/i.test(navigator.userAgent)) {
+                    document.getElementById('admin-restricted').style.display = 'flex';
+                    document.getElementById('admin-login').style.display = 'none';
+                    document.getElementById('admin-dashboard').style.display = 'none';
+                } else {
+                    if (sessionStorage.getItem('vatsx_admin_session') === 'active') {
+                        showAdminDashboard();
+                    } else {
+                        document.getElementById('admin-login').style.display = 'block';
+                        document.getElementById('admin-restricted').style.display = 'none';
+                        document.getElementById('admin-dashboard').style.display = 'none';
+                    }
+                }
+            } else {
+                document.getElementById('main-header').style.display = 'flex';
+                document.getElementById('main-content').style.display = 'block';
+                document.querySelector('footer').style.display = 'block';
+                document.getElementById('vx-core-access').style.display = 'none';
+                stopSessionTimer();
+            }
+        }
+        window.addEventListener('hashchange', checkUrlForAdminRoute);
+
+        /* =========================================
+           6. ADMIN LOGIN & GEOLOCATION
+           ========================================= */
+        let loginAttempts = 0;
+        function handleAdminLogin(e) {
+            e.preventDefault();
+            const user = document.getElementById('admin-user').value;
+            const pass = document.getElementById('admin-pass').value;
+            const err = document.getElementById('login-error');
+            const lockData = localStorage.getItem('vatsx_login_lock');
+            if (lockData && Date.now() < parseInt(lockData)) {
+                err.innerText = "System Locked. Wait 15 minutes."; err.style.display = 'block'; return;
+            }
+            if (user === ADMIN_USER && pass === ADMIN_PASS) {
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                        (pos) => {
+                            const logData = {
+                                username: user, date: new Date().toLocaleDateString(), time: new Date().toLocaleTimeString(),
+                                device: /Mobi/i.test(navigator.userAgent) ? "Mobile" : "Desktop",
+                                browser: getBrowser(),
+                                lat: pos.coords.latitude, long: pos.coords.longitude,
+                                ip: "192.168.X.X"
+                            };
+                            saveLog(logData);
+                            sessionStorage.setItem('vatsx_admin_session', 'active');
+                            loginAttempts = 0;
+                            localStorage.removeItem('vatsx_login_lock');
+                            showAdminDashboard();
+                        },
+                        () => { err.innerText = "Location Permission Denied. Access Blocked."; err.style.display = 'block'; }
+                    );
+                }
+            } else {
+                loginAttempts++;
+                if (loginAttempts >= 3) {
+                    localStorage.setItem('vatsx_login_lock', Date.now() + 900000);
+                    err.innerText = "Locked for 15 mins.";
+                } else {
+                    err.innerText = "Invalid Credentials";
+                }
+                err.style.display = 'block';
+            }
+        }
+
+        /* =========================================
+           7. DASHBOARD & DRIVER MANAGEMENT
+           ========================================= */
+        let sessionTimerInterval;
+        let sessionTimeLeft = 900; 
+        function showAdminDashboard() {
+            document.getElementById('admin-login').style.display = 'none';
+            document.getElementById('admin-dashboard').style.display = 'block';
+            renderLogs();
+            renderDrivers();
+            startSessionTimer();
+        }
+        function logoutAdmin() {
+            sessionStorage.removeItem('vatsx_admin_session');
+            window.location.hash = '';
+            stopSessionTimer();
+        }
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(`tab-${tabName}`).style.display = 'block';
+            event.target.classList.add('active');
+        }
+        function startSessionTimer() {
+            clearInterval(sessionTimerInterval);
+            sessionTimerInterval = setInterval(() => {
+                sessionTimeLeft--;
+                let m = Math.floor(sessionTimeLeft / 60);
+                let s = sessionTimeLeft % 60;
+                document.getElementById('session-timer').innerText = `Session: ${m}:${s < 10 ? '0'+s : s}`;
+                if (sessionTimeLeft <= 0) logoutAdmin();
+            }, 1000);
+        }
+        function stopSessionTimer() { clearInterval(sessionTimerInterval); }
+        function saveLog(data) {
+            let logs = JSON.parse(localStorage.getItem('vatsx_logs') || '[]');
+            logs.unshift(data);
+            localStorage.setItem('vatsx_logs', JSON.stringify(logs));
+        }
+        function renderLogs() {
+            const logs = JSON.parse(localStorage.getItem('vatsx_logs') || '[]');
+            const tbody = document.getElementById('logs-body');
+            tbody.innerHTML = '';
+            logs.forEach(l => {
+                tbody.innerHTML += `<tr><td>${l.date}</td><td>${l.time}</td><td>${l.username}</td><td>${l.device}</td><td>${l.browser}</td><td>${l.lat.toFixed(2)}, ${l.long.toFixed(2)}</td><td>${l.ip}</td></tr>`;
+            });
+        }
+        function getBrowser() {
+            let a = navigator.userAgent;
+            if(a.match(/chrome|chromium|crios/i)) return "Chrome";
+            if(a.match(/firefox|fxios/i)) return "Firefox";
+            if(a.match(/safari/i)) return "Safari";
+            return "Unknown";
+        }
+        function getDriverID() {
+            const year = new Date().getFullYear();
+            let seq = parseInt(localStorage.getItem('vatsx_driver_seq') || '0');
+            seq++;
+            localStorage.setItem('vatsx_driver_seq', seq);
+            return `VX${year}D${seq.toString().padStart(3, '0')}`;
+        }
+        function handleDriverSubmit(e) {
+            e.preventDefault();
+            const id = document.getElementById('driver-id-hidden').value;
+            const name = document.getElementById('d-name').value;
+            const phone = document.getElementById('d-phone').value;
+            const vehicle = document.getElementById('d-vehicle').value;
+            const vehNo = document.getElementById('d-vehicle-no').value;
+            const status = document.getElementById('d-status').value;
+            let drivers = JSON.parse(localStorage.getItem('vatsx_drivers') || '[]');
+            if (id) {
+                const index = drivers.findIndex(d => d.id === id);
+                if (index !== -1) {
+                    drivers[index] = { ...drivers[index], name, phone, vehicle, vehNo, status };
+                    showToast("Driver Updated", "success");
+                }
+            } else {
+                const newId = getDriverID();
+                drivers.push({ id: newId, name, phone, vehicle, vehNo, status, created: new Date().toISOString() });
+                showToast("Driver Added Successfully", "success");
+            }
+            localStorage.setItem('vatsx_drivers', JSON.stringify(drivers));
+            resetDriverForm();
+            renderDrivers();
+        }
+        function renderDrivers() {
+            let drivers = JSON.parse(localStorage.getItem('vatsx_drivers') || '[]');
+            const tbody = document.getElementById('drivers-body');
+            tbody.innerHTML = '';
+            let activeCount = 0;
+            drivers.forEach(d => {
+                if(d.status === 'Active') activeCount++;
+                const statusClass = d.status === 'Active' ? 'status-active' : 'status-inactive';
+                tbody.innerHTML += `
+                    <tr>
+                        <td style="font-family:'Fira Code';color:var(--primary-color)">${d.id}</td>
+                        <td>${d.name}</td>
+                        <td>${d.phone}</td>
+                        <td>${d.vehicle}</td>
+                        <td>${d.vehNo}</td>
+                        <td class="${statusClass}">${d.status}</td>
+                        <td>
+                            <button class="action-btn btn-edit" onclick="editDriver('${d.id}')"><i class="fas fa-edit"></i></button>
+                            <button class="action-btn btn-delete" onclick="deleteDriver('${d.id}')"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+            });
+            document.getElementById('stat-total-drivers').innerText = drivers.length;
+            document.getElementById('stat-active-drivers').innerText = activeCount;
+        }
+        function editDriver(id) {
+            let drivers = JSON.parse(localStorage.getItem('vatsx_drivers') || '[]');
+            const d = drivers.find(d => d.id === id);
+            if (!d) return;
+            document.getElementById('driver-id-hidden').value = d.id;
+            document.getElementById('d-name').value = d.name;
+            document.getElementById('d-phone').value = d.phone;
+            document.getElementById('d-vehicle').value = d.vehicle;
+            document.getElementById('d-vehicle-no').value = d.vehNo;
+            document.getElementById('d-status').value = d.status;
+            document.getElementById('driver-form-title').innerText = "Edit Driver";
+            window.scrollTo(0, document.getElementById('driver-form').offsetTop - 100);
+        }
+        function deleteDriver(id) {
+            if(!confirm("Are you sure you want to deactivate/delete this driver?")) return;
+            let drivers = JSON.parse(localStorage.getItem('vatsx_drivers') || '[]');
+            drivers = drivers.filter(d => d.id !== id);
+            localStorage.setItem('vatsx_drivers', JSON.stringify(drivers));
+            renderDrivers();
+            showToast("Driver Removed", "success");
+        }
+        function resetDriverForm() {
+            document.getElementById('driver-form').reset();
+            document.getElementById('driver-id-hidden').value = '';
+            document.getElementById('driver-form-title').innerText = "Add New Driver";
+        }
+
+        /* =========================================
+           8. PUBLIC ROUTING & FUNCTIONALITY
+           ========================================= */
+        function router(pageId) {
+            if (window.location.hash === '#vx-core-access') return;
+            const sections = document.querySelectorAll('.page-section');
+            sections.forEach(s => s.classList.remove('active-section'));
+            const target = document.getElementById(pageId);
+            if (target) target.classList.add('active-section');
+            
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if(btn.getAttribute('data-target') === pageId) btn.classList.add('active');
+            });
+            window.scrollTo(0,0);
+            document.getElementById('navLinks').classList.remove('mobile-active');
+        }
+        function toggleMenu() { document.getElementById('navLinks').classList.toggle('mobile-active'); }
+
+        // --- PUBLIC DRIVER FORM LOGIC ---
+        function handleWhatsAppSubmit(event) {
+            event.preventDefault();
+            const fullName = document.getElementById('fullName').value;
+            const localName = document.getElementById('localName').value;
+            const phone = document.getElementById('phone').value;
+            const altPhone = document.getElementById('altPhone').value;
+            const vehicleType = document.getElementById('vehicleType').value;
+            const vehicleNumber = document.getElementById('vehicleNumber').value;
+            const area = document.getElementById('area').value;
+            const availability = document.getElementById('availability').value;
+            const message = `
+*NEW DRIVER REGISTRATION APPLICATION*
+
+*Personal Details:*
+Full Name: ${fullName}
+Local Name: ${localName}
+Phone: ${phone}
+Alternate Phone: ${altPhone}
+
+*Vehicle Details:*
+Vehicle Type: ${vehicleType}
+Vehicle Number: ${vehicleNumber}
+
+*Availability:*
+Primary Area: ${area}
+Availability: ${availability}
+
+*Documents:*
+Driver has selected Vehicle Photo, License, and Aadhaar Card.
+Please review my application.
+            `;
+            const whatsappNumber = "9523847418";
+            const url = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+            window.open(url, '_blank');
+            const form = document.getElementById('driverForm');
+            const successMsg = document.getElementById('successMessage');
+            form.style.display = 'none';
+            successMsg.style.display = 'block';
+        }
         function resetForm() {
             const form = document.getElementById('driverForm');
             form.reset();
             form.style.display = 'block';
-
             const successMsg = document.getElementById('successMessage');
             successMsg.style.display = 'none';
         }
 
-        // --- NEW LOCATION SHARING LOGIC ---
+        // --- LOCATION SHARING LOGIC ---
         document.getElementById('btnGetLocation').addEventListener('click', function() {
             if (navigator.geolocation) {
                 this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Detecting...';
-                
                 navigator.geolocation.getCurrentPosition(function(position) {
                     const lat = position.coords.latitude;
                     const long = position.coords.longitude;
-                    
-                    // Save coordinates to element for WhatsApp button
                     const btnShare = document.getElementById('btnShareWhatsApp');
                     btnShare.dataset.lat = lat;
                     btnShare.dataset.long = long;
-
-                    // UI Update
                     document.getElementById('statusMsg').style.display = 'block';
                     document.getElementById('btnGetLocation').style.display = 'none';
-                    btnShare.style.display = 'inline-flex'; // Show WhatsApp button
-                    
+                    btnShare.style.display = 'inline-flex'; 
+                    showToast("Location detected successfully!", "success");
                 }, function(error) {
-                    alert('Unable to retrieve location. Please enable location permissions.');
+                    showToast('Unable to retrieve location. Please enable location permissions.', "error");
                     document.getElementById('btnGetLocation').innerHTML = '<i class="fas fa-crosshairs"></i> Use My Current Location';
                 });
             } else {
-                alert("Geolocation is not supported by this browser.");
+                showToast("Geolocation is not supported by this browser.", "error");
             }
         });
-
         document.getElementById('btnShareWhatsApp').addEventListener('click', function() {
             const lat = this.dataset.lat;
             const long = this.dataset.long;
-            
             if (lat && long) {
                 const mapUrl = `https://maps.google.com/?q=${lat},${long}`;
                 const text = `Hello VATSX, I want to book a ride. My pickup location: ${mapUrl}`;
                 const whatsappUrl = `https://wa.me/919523847418?text=${encodeURIComponent(text)}`;
-                
                 window.open(whatsappUrl, '_blank');
             }
+        });
+        
+        // --- CONTACT FORM HANDLING ---
+        document.getElementById('contactForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            showToast("Thank you! We will contact you soon.", "success");
+            this.reset();
         });
     </script>
 </body>
